@@ -68,26 +68,34 @@ python scripts/run_unet.py --dataset busuclm --gpu 1
 
 ### 2. nnUNet 训练
 
-**首先设置环境变量**：
+**安装 nnUNet**：
 ```bash
-export nnUNet_raw="/root/workspace/breast-seg/nnunet_data/raw"
-export nnUNet_preprocessed="/root/workspace/breast-seg/nnunet_data/preprocessed"
-export nnUNet_results="/root/workspace/breast-seg/nnunet_data/results"
+pip install nnunetv2
 ```
 
-**运行训练**：
+**环境变量由脚本自动设置**，无需手动配置。
+
+**完整步骤**：
 ```bash
-# 转换数据格式
+# 1. 转换数据格式
 python scripts/convert_to_nnunet.py --data_root ./data
 
-# 预处理
+# 2. 预处理 (Dataset001_BUSI, Dataset002_BUSUCLM)
 python scripts/run_nnunet.py --action preprocess --dataset_id 1
+python scripts/run_nnunet.py --action preprocess --dataset_id 2
 
-# 训练
-python scripts/run_nnunet.py --action train --dataset_id 1
+# 3. 训练 (默认1000 epochs，约6-8小时)
+CUDA_VISIBLE_DEVICES=0 nnUNetv2_train 1 2d 0 --npz --disable_compile
+CUDA_VISIBLE_DEVICES=0 nnUNetv2_train 2 2d 0 --npz --disable_compile
 
-# 预测
+# 4. 预测
 python scripts/run_nnunet.py --action predict --dataset_id 1
+python scripts/run_nnunet.py --action predict --dataset_id 2
+```
+
+**后台运行（可选）**：
+```bash
+nohup nnUNetv2_train 1 2d 0 --npz --disable_compile > nnunet_busi.log 2>&1 &
 ```
 
 ### 3. 批量运行
