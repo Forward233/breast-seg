@@ -8,8 +8,8 @@ env/
 venv/
 .venv/
 
-# Data
-data/
+# Data (数据集已推送到仓库)
+# data/
 nnunet_data/
 
 # Results
