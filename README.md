@@ -68,6 +68,14 @@ python scripts/run_unet.py --dataset busuclm --gpu 1
 
 ### 2. nnUNet 训练
 
+**首先设置环境变量**：
+```bash
+export nnUNet_raw="/root/workspace/breast-seg/nnunet_data/raw"
+export nnUNet_preprocessed="/root/workspace/breast-seg/nnunet_data/preprocessed"
+export nnUNet_results="/root/workspace/breast-seg/nnunet_data/results"
+```
+
+**运行训练**：
 ```bash
 # 转换数据格式
 python scripts/convert_to_nnunet.py --data_root ./data

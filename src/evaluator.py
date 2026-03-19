@@ -88,7 +88,7 @@ class Evaluator:
     
     def load_checkpoint(self, checkpoint_path: str):
         """加载模型检查点"""
-        checkpoint = torch.load(checkpoint_path, map_location=self.device)
+        checkpoint = torch.load(checkpoint_path, map_location=self.device, weights_only=False)
         self.model.load_state_dict(checkpoint['model_state_dict'])
         print(f'Loaded model from {checkpoint_path}')
         return checkpoint.get('epoch', -1), checkpoint.get('best_dice', 0.0)
