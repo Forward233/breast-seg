@@ -20,3 +20,6 @@ tensorboard>=2.14.0
 
 # Configuration
 PyYAML>=6.0
+
+# nnUNet Framework
+nnunetv2>=2.2
