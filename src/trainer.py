@@ -190,8 +190,11 @@ class Trainer:
         self.logger.info(f'\nTraining completed!')
         self.logger.info(f'Best Dice: {self.best_dice:.4f} at epoch {self.best_epoch}')
         
+        history_serializable = {
+            k: [float(v) for v in vals] for k, vals in self.history.items()
+        }
         with open(self.save_dir / 'history.json', 'w') as f:
-            json.dump(self.history, f, indent=2)
+            json.dump(history_serializable, f, indent=2)
         
         return self.history
     
