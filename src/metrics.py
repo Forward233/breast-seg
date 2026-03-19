@@ -103,7 +103,7 @@ def compute_metrics(pred: np.ndarray, target: np.ndarray) -> Dict[str, float]:
         metrics['Specificity'].append(specificity_score(p, t))
         metrics['HD95'].append(hausdorff_distance_95(p, t))
     
-    return {k: np.mean(v) for k, v in metrics.items()}
+    return {k: float(np.mean(v)) for k, v in metrics.items()}
 
 
 class DiceLoss(torch.nn.Module):
