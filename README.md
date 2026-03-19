@@ -85,6 +85,8 @@ python scripts/run_nnunet.py --action preprocess --dataset_id 1
 python scripts/run_nnunet.py --action preprocess --dataset_id 2
 
 # 3. 训练 (默认1000 epochs，约6-8小时)
+# 命令格式: nnUNetv2_train <dataset_id> <config> <fold> [options]
+# fold=0 表示只训练第0折（单折训练），fold=all 表示使用全部数据
 CUDA_VISIBLE_DEVICES=0 nnUNetv2_train 1 2d 0 --npz --disable_compile
 CUDA_VISIBLE_DEVICES=0 nnUNetv2_train 2 2d 0 --npz --disable_compile
 
