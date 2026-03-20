@@ -45,7 +45,9 @@ def hausdorff_distance_95(pred: np.ndarray, target: np.ndarray) -> float:
     if np.sum(pred) == 0 and np.sum(target) == 0:
         return 0.0
     if np.sum(pred) == 0 or np.sum(target) == 0:
-        return np.inf
+        # 使用图像对角线长度作为最大距离
+        h, w = pred.shape[-2:]
+        return np.sqrt(h**2 + w**2)
     
     try:
         from medpy.metric.binary import hd95
