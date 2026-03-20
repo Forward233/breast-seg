@@ -39,20 +39,22 @@ def run_nnunet_plan_and_preprocess(dataset_id: int):
     subprocess.run(cmd, check=True)
 
 
-def run_nnunet_train(dataset_id: int, fold: int = 0, config: str = '2d'):
+def run_nnunet_train(dataset_id: int, fold: int = 0, config: str = '2d', num_epochs: int = 200):
     """运行 nnUNet 训练
     
     Args:
         dataset_id: 数据集 ID
         fold: 交叉验证折数 (0-4 或 'all')
         config: 配置 ('2d', '3d_fullres', '3d_lowres')
+        num_epochs: 训练轮数
     """
     cmd = [
         'nnUNetv2_train',
         str(dataset_id),
         config,
         str(fold),
-        '--npz'
+        '--npz',
+        '--num_epochs', str(num_epochs)
     ]
     print(f'Running: {" ".join(cmd)}')
     subprocess.run(cmd, check=True)
@@ -85,6 +87,8 @@ def main():
                         help='Fold for training')
     parser.add_argument('--config', type=str, default='2d',
                         help='nnUNet configuration')
+    parser.add_argument('--num_epochs', type=int, default=200,
+                        help='Number of training epochs')
     args = parser.parse_args()
     
     setup_nnunet_env(args.nnunet_base)
@@ -95,7 +99,7 @@ def main():
     
     if args.action in ['train', 'all']:
         print('\n=== Training ===')
-        run_nnunet_train(args.dataset_id, args.fold, args.config)
+        run_nnunet_train(args.dataset_id, args.fold, args.config, args.num_epochs)
     
     if args.action in ['predict', 'all']:
         print('\n=== Predicting ===')

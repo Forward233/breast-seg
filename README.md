@@ -19,9 +19,10 @@ breast-seg/
 │   └── models/
 │       └── unet.py           # U-Net 模型
 ├── scripts/
-│   ├── run_unet.py           # UNet 训练入口
-│   ├── run_nnunet.py         # nnUNet 训练入口
-│   ├── convert_to_nnunet.py  # 数据格式转换
+│   ├── run_unet.py              # UNet 训练入口
+│   ├── train_nnunet_custom.py   # nnUNet 自定义训练（完全对齐需求参数）
+│   ├── run_nnunet.py            # nnUNet 官方训练入口
+│   ├── convert_to_nnunet.py     # 数据格式转换
 │   └── run_all_experiments.py
 ├── results/                   # 输出目录
 └── requirements.txt
@@ -68,37 +69,48 @@ python scripts/run_unet.py --dataset busuclm --gpu 1
 
 ### 2. nnUNet 训练
 
-**安装 nnUNet**：
+**安装依赖**：
 ```bash
-pip install nnunetv2
+pip install nnunetv2 dynamic-network-architectures
 ```
-
-**环境变量由脚本自动设置**，无需手动配置。
 
 **完整步骤**：
 ```bash
-# 1. 转换数据格式
+# 1. 转换数据格式（生成nnUNet格式数据）
 python scripts/convert_to_nnunet.py --data_root ./data
 
-# 2. 预处理 (Dataset001_BUSI, Dataset002_BUSUCLM)
-python scripts/run_nnunet.py --action preprocess --dataset_id 1
-python scripts/run_nnunet.py --action preprocess --dataset_id 2
+# 2. 训练（使用自定义脚本，完全对齐需求参数）
+# BUSI 数据集
+CUDA_VISIBLE_DEVICES=0 python scripts/train_nnunet_custom.py \
+  --dataset_id 1 \
+  --epochs 200 \
+  --batch_size 4 \
+  --lr 1e-4 \
+  --patience 20 \
+  --gpu 0
 
-# 3. 训练 (默认1000 epochs，约6-8小时)
-# 命令格式: nnUNetv2_train <dataset_id> <config> <fold> [options]
-# fold=0 表示只训练第0折（单折训练），fold=all 表示使用全部数据
-CUDA_VISIBLE_DEVICES=0 nnUNetv2_train 1 2d 0 --npz --disable_compile
-CUDA_VISIBLE_DEVICES=0 nnUNetv2_train 2 2d 0 --npz --disable_compile
-
-# 4. 预测
-python scripts/run_nnunet.py --action predict --dataset_id 1
-python scripts/run_nnunet.py --action predict --dataset_id 2
+# BUS-UCLM 数据集
+CUDA_VISIBLE_DEVICES=0 python scripts/train_nnunet_custom.py \
+  --dataset_id 2 \
+  --epochs 200 \
+  --batch_size 4 \
+  --lr 1e-4 \
+  --patience 20 \
+  --gpu 0
 ```
 
-**后台运行（可选）**：
+**后台运行**：
 ```bash
-nohup nnUNetv2_train 1 2d 0 --npz --disable_compile > nnunet_busi.log 2>&1 &
+CUDA_VISIBLE_DEVICES=0 nohup python scripts/train_nnunet_custom.py \
+  --dataset_id 1 --epochs 200 --batch_size 4 --lr 1e-4 --patience 20 \
+  > nnunet_busi.log 2>&1 &
 ```
+
+**自定义脚本特性**：
+- 使用 nnUNet PlainConvUNet 架构
+- 完全对齐需求参数（Adam优化器、lr=1e-4、早停等）
+- 自动划分 train/val (7:1)，test 单独处理
+- 输出与 UNet 格式一致
 
 ### 3. 批量运行
 
