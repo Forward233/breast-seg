@@ -2,10 +2,15 @@
 """自定义nnUNet训练脚本 - 完全按需求实现训练参数"""
 
 import os
+import sys
 import json
 import logging
 from pathlib import Path
 from typing import Dict, Tuple
+
+# 添加项目根目录到路径
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 import torch
 import torch.nn as nn
